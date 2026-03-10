@@ -20,7 +20,7 @@ async function pasteText() {
 
     const code = data.code;
 
-   const link = "https://clip-drop.vercel.app/get.html?code=" + code;
+   const link = "https://clipdrop-liard.vercel.app/get.html?code=" + code;
 
     document.getElementById("result").innerHTML =
     `
