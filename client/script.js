@@ -1,8 +1,10 @@
+const API_URL = "https://clipdrop-lio8.onrender.com";
+
 async function pasteText() {
 
     const text = document.getElementById("text").value;
 
-    const res = await fetch("http://localhost:5000/paste", {
+    const res = await fetch(API_URL + "/paste", {
 
         method: "POST",
 
@@ -53,7 +55,7 @@ async function getText(){
 
     const code = document.getElementById("code").value;
 
-    const res = await fetch("http://localhost:5000/get/" + code);
+    const res = await fetch(API_URL + "/get/" + code);
 
     const data = await res.json();
 
@@ -95,4 +97,4 @@ window.onload = function(){
 
     }
 
-}
+};
