@@ -98,3 +98,24 @@ window.onload = function(){
     }
 
 };
+
+async function updateText(){
+
+    const code = document.getElementById("code").value;
+    const text = document.getElementById("text").value;
+
+    await fetch(API_URL + "/update/" + code, {
+
+        method: "PUT",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body: JSON.stringify({ text })
+
+    });
+
+    alert("Text updated successfully!");
+
+}
