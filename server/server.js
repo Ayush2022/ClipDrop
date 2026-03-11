@@ -61,6 +61,22 @@ app.put("/update/:code", async (req, res) => {
 
 });
 
+app.put("/update/:code", async (req, res) => {
+
+    const snippet = await Snippet.findOneAndUpdate(
+        { code: req.params.code },
+        { text: req.body.text },
+        { new: true }
+    );
+
+    if (!snippet) {
+        return res.status(404).json({ message: "Snippet not found" });
+    }
+
+    res.json({ message: "Snippet updated successfully" });
+
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
