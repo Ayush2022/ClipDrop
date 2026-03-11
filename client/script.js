@@ -101,21 +101,28 @@ window.onload = function(){
 
 async function updateText(){
 
-    const code = document.getElementById("code").value;
     const text = document.getElementById("text").value;
 
-    await fetch(API_URL + "/update/" + code, {
+    // get code from result section
+    const codeElement = document.querySelector("#result b");
 
+    if(!codeElement){
+        alert("Generate a code first!");
+        return;
+    }
+
+    const code = codeElement.innerText;
+
+    const res = await fetch(API_URL + "/update/" + code, {
         method: "PUT",
-
         headers:{
             "Content-Type":"application/json"
         },
-
         body: JSON.stringify({ text })
-
     });
 
-    alert("Text updated successfully!");
+    const data = await res.json();
+
+    alert(data.message);
 
 }
