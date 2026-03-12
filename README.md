@@ -1,9 +1,9 @@
-# ClipDrop
+# KlipDrop
 
 Live Website 🚀  
-https://clipdrop-liard.vercel.app
+https://klipdrop.vercel.app/
 
-ClipDrop is a clipboard sharing web app that lets you paste text on one device and retrieve it on another using a unique code or QR scan.
+KlipDrop is a clipboard sharing web app that lets you paste text on one device and retrieve it on another using a unique code or QR scan.
 
 ## Features
 - Generate unique clipboard code
