@@ -10,9 +10,16 @@ const Snippet = require("./models/Snippet");
 
 const app = express();
 
+const fs = require("fs");
+
+// ensure uploads folder exists
+if (!fs.existsSync("uploads")) {
+    fs.mkdirSync("uploads");
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, "uploads/"); // now guaranteed to exist
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -50,29 +57,29 @@ app.post("/paste", async (req, res) => {
 
 app.get("/get/:code", async (req, res) => {
 
-    try {
+    const snippet = await Snippet.findOne({ code: req.params.code });
 
-        const snippet = await Snippet.findOne({ code: req.params.code });
+    if (!snippet) {
+        return res.status(404).json({ message: "Not found" });
+    }
 
-        // ❌ Not found
-        if (!snippet) {
-            return res.status(404).json({ message: "Not found" });
+    // 🔥 FILE LOGIC
+    if (snippet.isFile) {
+
+        // ⏳ Expiry check (10 min)
+        const expiryTime = new Date(snippet.createdAt).getTime() + 600000;
+
+        if (Date.now() > expiryTime) {
+            return res.status(410).json({ message: "File expired" });
         }
 
-        // 🔐 Password check (ONLY if password exists → means file)
+        // 🔐 Password check
         if (snippet.password && snippet.password !== req.query.password) {
             return res.status(403).json({ message: "Wrong password" });
         }
-
-        // ✅ Send data
-        res.json(snippet);
-
-    } catch (err) {
-
-        console.error(err);
-        res.status(500).json({ message: "Server error" });
-
     }
+
+    res.json(snippet);
 
 });
 
@@ -83,9 +90,10 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     const fileUrl = "/uploads/" + req.file.filename;
 
     const snippet = new Snippet({
-        code: code,
+        code,
         text: fileUrl,
-        password: req.body.password || null // 🔐 only for files
+        password: req.body.password || "",
+        isFile: true
     });
 
     await snippet.save();

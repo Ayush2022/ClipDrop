@@ -54,55 +54,22 @@ async function getText(){
 
     const code = document.getElementById("code").value;
 
-    // 🔐 password (optional)
-    let password = "";
-    const passInput = document.getElementById("passwordInput");
-    if(passInput){
-        password = passInput.value;
-    }
-
-    // ✅ fetch data properly
-    const res = await fetch(API_URL + "/get/" + code + "?password=" + password);
-
+    const res = await fetch(API_URL + "/get/" + code);
     const data = await res.json();
 
-    // ❌ error handling
     if(data.message){
         alert(data.message);
         return;
     }
 
-    // ⏳ Expiry timer
-    const expiryTime = new Date(data.createdAt).getTime() + 600000;
-
-    setInterval(() => {
-
-        const now = new Date().getTime();
-        const diff = expiryTime - now;
-
-        if(diff <= 0){
-            document.getElementById("timer").innerText = "Expired";
-            return;
-        }
-
-        const minutes = Math.floor(diff / 60000);
-        const seconds = Math.floor((diff % 60000) / 1000);
-
-        document.getElementById("timer").innerText =
-        `Expires in ${minutes}:${seconds}`;
-
-    }, 1000);
-
-    // 🔥 FILE vs TEXT
+    // ❌ BLOCK FILES here
     if(data.text.includes("/uploads/")){
-
-        window.open(API_URL + data.text);
-
-    } else {
-
-        document.getElementById("output").value = data.text;
-
+        alert("This is a file. Use file page.");
+        return;
     }
+
+    // ✅ ONLY TEXT
+    document.getElementById("output").value = data.text;
 
 }
 
@@ -141,21 +108,7 @@ function copyCode(code){
 
 }
 
-window.onload = function(){
 
-    const params = new URLSearchParams(window.location.search);
-
-    const code = params.get("code");
-
-    if(code){
-
-        document.getElementById("code").value = code;
-
-        getText();
-
-    }
-
-};
 
 async function uploadFile(){
 
@@ -187,18 +140,18 @@ async function uploadFile(){
 
     xhr.onload = function(){
 
-        const data = JSON.parse(xhr.responseText);
+    const data = JSON.parse(xhr.responseText);
 
-        const code = data.code;
+    const code = data.code;
 
-        const link = window.location.origin + "/get.html?code=" + code;
+    const link = window.location.origin + "/getfile.html?code=" + code;
 
-        document.getElementById("result").innerHTML = `
-        <p class="text-green-400">File uploaded!</p>
-        <p>Code: <b>${code}</b></p>
-        <a href="${link}" class="text-blue-400">${link}</a>
-        `;
-    };
+    document.getElementById("result").innerHTML = `
+    <p class="text-green-400">File uploaded!</p>
+    <p>Code: <b>${code}</b></p>
+    <a href="${link}" class="text-blue-400">${link}</a>
+    `;
+};
 
     xhr.send(formData);
 }
