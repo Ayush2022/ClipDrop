@@ -54,23 +54,27 @@ async function getText(){
 
     const code = document.getElementById("code").value;
 
+    console.log("Fetching code:", code);
+
     const res = await fetch(API_URL + "/get/" + code);
+
+    console.log("Response status:", res.status);
+
     const data = await res.json();
+
+    console.log("Response data:", data);
 
     if(data.message){
         alert(data.message);
         return;
     }
 
-    // ❌ BLOCK FILES here
     if(data.text.includes("/uploads/")){
         alert("This is a file. Use file page.");
         return;
     }
 
-    // ✅ ONLY TEXT
     document.getElementById("output").value = data.text;
-    document.getElementById("output").value = "Fetching...";
 
 }
 
