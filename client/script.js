@@ -80,19 +80,20 @@ async function getText(){
 
 const dropArea = document.getElementById("dropArea");
 
-dropArea.addEventListener("click", () => {
-    document.getElementById("fileInput").click();
-});
+if(dropArea){
+    dropArea.addEventListener("click", () => {
+        document.getElementById("fileInput").click();
+    });
 
-dropArea.addEventListener("dragover", (e) => {
-    e.preventDefault();
-});
+    dropArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+    });
 
-dropArea.addEventListener("drop", (e) => {
-    e.preventDefault();
-    document.getElementById("fileInput").files = e.dataTransfer.files;
-});
-
+    dropArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        document.getElementById("fileInput").files = e.dataTransfer.files;
+    });
+}
 function copyText(){
 
     const text = document.getElementById("output");
@@ -213,5 +214,23 @@ document.addEventListener("DOMContentLoaded", function(){
         }
 
     }, 500);
+
+});
+// ✅ Auto-fill code from URL
+window.addEventListener("load", function(){
+
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    if(code){
+        const input = document.getElementById("code");
+
+        if(input){
+            input.value = code;   // ✅ fills input box
+
+            // OPTIONAL: auto fetch text also
+            getText();
+        }
+    }
 
 });
