@@ -4,11 +4,53 @@ const API_URL = "https://clipdrop-lio8.onrender.com";
 const fileInput = document.getElementById("fileInput");
 const fileNameText = document.getElementById("fileName");
 
+// 🔥 NEW ADDITION (PUT HERE)
+const fileInfo = document.getElementById("fileInfo");
+const imagePreview = document.getElementById("imagePreview");
+const pdfPreview = document.getElementById("pdfPreview");
+const previewContainer = document.getElementById("previewContainer");
+
+function showFileDetails(file){
+
+    const sizeKB = (file.size / 1024).toFixed(2);
+
+    if(fileInfo){
+        fileInfo.classList.remove("hidden");
+        fileInfo.innerText = `Type: ${file.type} | Size: ${sizeKB} KB`;
+    }
+
+    if(previewContainer){
+        previewContainer.classList.remove("hidden");
+    }
+
+    // IMAGE
+    if(file.type.startsWith("image/")){
+        const url = URL.createObjectURL(file);
+        imagePreview.src = url;
+        imagePreview.classList.remove("hidden");
+        pdfPreview.classList.add("hidden");
+    }
+
+    // PDF
+    else if(file.type === "application/pdf"){
+        const url = URL.createObjectURL(file);
+        pdfPreview.src = url;
+        pdfPreview.classList.remove("hidden");
+        imagePreview.classList.add("hidden");
+    }
+
+    else{
+        imagePreview.classList.add("hidden");
+        pdfPreview.classList.add("hidden");
+    }
+}
+
 if(fileInput){
     fileInput.addEventListener("change", () => {
         if(fileInput.files.length > 0){
             selectedFile = fileInput.files[0];   // ✅ store file
             fileNameText.innerText = selectedFile.name;
+            showFileDetails(selectedFile);
         }
     });
 }
@@ -117,6 +159,7 @@ dropArea.addEventListener("drop", (e) => {
     if(files.length > 0){
         selectedFile = files[0];   // ✅ store file
         fileNameText.innerText = selectedFile.name;
+        showFileDetails(selectedFile);
     }
 });
 }
@@ -150,14 +193,20 @@ async function uploadFile(){
     xhr.open("POST", API_URL + "/upload", true);
 
     // progress bar
-    xhr.upload.onprogress = function(e){
-        if(e.lengthComputable){
-            const percent = Math.round((e.loaded / e.total) * 100);
+xhr.upload.onprogress = function(e){
+    if(e.lengthComputable){
 
-            document.getElementById("progressBar").style.width = percent + "%";
-            document.getElementById("progressText").innerText = percent + "% uploading...";
-        }
-    };
+        const percent = Math.round((e.loaded / e.total) * 100);
+
+        const bar = document.getElementById("progressBar");
+        bar.style.width = percent + "%";
+
+        bar.style.transition = "width 0.3s ease";   // 🔥 smooth
+
+        document.getElementById("progressText").innerText =
+        percent + "% uploading...";
+    }
+};
 
     xhr.onload = function(){
 
@@ -166,6 +215,7 @@ async function uploadFile(){
     const code = data.code;
 
     const link = window.location.origin + "/getfile.html?code=" + code;
+    document.getElementById("progressText").innerText = "✅ Upload Complete!";
 
     document.getElementById("result").innerHTML = `
     <p class="text-green-400">File uploaded!</p>
